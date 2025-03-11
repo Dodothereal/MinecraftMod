@@ -25,6 +25,7 @@ public class AutoMiner {
     private MiningState miningState = MiningState.SEARCHING;
     private int miningTicks = 0;
     private final Random random = new Random();
+    private int breakingProgress = 0;
 
     private enum MiningState {
         SEARCHING,
@@ -44,6 +45,7 @@ public class AutoMiner {
     public void toggle() {
         this.enabled = !this.enabled;
         this.miningState = MiningState.SEARCHING;
+        System.out.println("[OreMiner] Mining toggled: " + (this.enabled ? "ON" : "OFF"));
     }
 
     public void onTick() {
@@ -68,6 +70,7 @@ public class AutoMiner {
 
         if (targetOre != null) {
             // Found an ore, switch to rotating state
+            System.out.println("[OreMiner] Found ore at " + targetOre.toString() + ", type: " + oreDetector.getOreTypeName(targetOre));
             miningState = MiningState.ROTATING;
 
             // Select pickaxe
@@ -132,6 +135,7 @@ public class AutoMiner {
         MovingObjectPosition mop = mc.objectMouseOver;
         if (mop != null && mop.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK &&
                 mop.getBlockPos().equals(targetOre)) {
+            System.out.println("[OreMiner] Now looking at target, starting to mine");
             miningState = MiningState.MINING;
         }
     }
@@ -144,11 +148,17 @@ public class AutoMiner {
             return;
         }
 
+        // Reset breaking progress
+        breakingProgress = 0;
+
         // Start mining the block
         mc.getNetHandler().addToSendQueue(new C07PacketPlayerDigging(
                 C07PacketPlayerDigging.Action.START_DESTROY_BLOCK,
                 targetOre,
-                EnumFacing.DOWN)); // Direction doesn't matter much
+                EnumFacing.DOWN));
+
+        // Add this line to trigger the client-side animation
+        mc.playerController.onPlayerDamageBlock(targetOre, EnumFacing.DOWN);
 
         // Switch to waiting state
         miningState = MiningState.WAITING;
@@ -165,23 +175,31 @@ public class AutoMiner {
 
         miningTicks++;
 
-        // Check if block is still there
-        Block block = mc.theWorld.getBlockState(targetOre).getBlock();
-        if (block.isAir(mc.theWorld, targetOre)) {
+        // Check if block is still there (using isAirBlock for more reliable detection)
+        if (mc.theWorld.isAirBlock(targetOre)) {
             // Block is broken, search for next ore
+            System.out.println("[OreMiner] Block broken, searching for next target");
             miningState = MiningState.SEARCHING;
             return;
         }
 
+        // Update breaking animation every few ticks
+        if (miningTicks % 4 == 0) {
+            // This continuously damages the block to show breaking progress
+            mc.playerController.onPlayerDamageBlock(targetOre, EnumFacing.DOWN);
+            breakingProgress++;
+            System.out.println("[OreMiner] Breaking progress: " + breakingProgress);
+        }
+
         // Break the block after a period of waiting
-        // This simulates breaking the block after mining it
         if (miningTicks >= 20) { // 1 second at 20 ticks/second
+            System.out.println("[OreMiner] Sending stop digging packet");
             mc.getNetHandler().addToSendQueue(new C07PacketPlayerDigging(
                     C07PacketPlayerDigging.Action.STOP_DESTROY_BLOCK,
                     targetOre,
                     EnumFacing.DOWN));
 
-            // Move back to searching
+            // Move back to searching state regardless
             miningState = MiningState.SEARCHING;
         }
     }

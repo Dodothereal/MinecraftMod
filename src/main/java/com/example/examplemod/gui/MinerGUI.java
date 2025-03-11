@@ -29,9 +29,14 @@ public class MinerGUI extends GuiScreen {
     public void initGui() {
         super.initGui();
 
+        System.out.println("[OreMiner] Initializing GUI");
+
         // Calculate GUI position (center of screen)
         this.guiLeft = (this.width - this.xSize) / 2;
         this.guiTop = (this.height - this.ySize) / 2;
+
+        // Clear existing buttons
+        this.buttonList.clear();
 
         // Add buttons
         MinerConfig config = OreMinerMod.getInstance().getConfig();
@@ -76,6 +81,8 @@ public class MinerGUI extends GuiScreen {
                 20,
                 "Range: " + config.getRange()
         ));
+
+        System.out.println("[OreMiner] GUI initialized with " + this.buttonList.size() + " buttons");
     }
 
     @Override
@@ -99,6 +106,8 @@ public class MinerGUI extends GuiScreen {
 
     @Override
     protected void actionPerformed(GuiButton button) throws IOException {
+        System.out.println("[OreMiner] Button clicked: " + button.id);
+
         MinerConfig config = OreMinerMod.getInstance().getConfig();
 
         if (button == toggleButton) {
@@ -111,17 +120,20 @@ public class MinerGUI extends GuiScreen {
             OreToggleButton oreButton = oreButtons.get(button.id - 1);
             oreButton.toggle();
             config.setOreEnabled(oreButton.getOreName(), oreButton.isEnabled());
+            System.out.println("[OreMiner] Toggled " + oreButton.getOreName() + " mining: " + oreButton.isEnabled());
         } else if (button == humanizeButton) {
             // Toggle humanize setting
             boolean humanize = !config.isHumanizeEnabled();
             config.setHumanizeEnabled(humanize);
             humanizeButton.displayString = "Humanize: " + (humanize ? "ON" : "OFF");
+            System.out.println("[OreMiner] Humanize setting: " + (humanize ? "ON" : "OFF"));
         } else if (button == rangeButton) {
             // Cycle through range options (4, 5, 6)
             int currentRange = config.getRange();
             int newRange = (currentRange % 3) + 4; // Cycle through 4, 5, 6
             config.setRange(newRange);
             rangeButton.displayString = "Range: " + newRange;
+            System.out.println("[OreMiner] Range setting: " + newRange);
         }
 
         config.saveConfig();

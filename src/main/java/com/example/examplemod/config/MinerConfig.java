@@ -29,6 +29,8 @@ public class MinerConfig {
         File configFile = new File(Minecraft.getMinecraft().mcDataDir, "config/oreminer.cfg");
         config = new Configuration(configFile);
         loadConfig();
+
+        System.out.println("[OreMiner] Config loaded from " + configFile.getAbsolutePath());
     }
 
     private void loadConfig() {
@@ -52,6 +54,12 @@ public class MinerConfig {
         if (config.hasChanged()) {
             config.save();
         }
+
+        // Log the loaded configuration
+        System.out.println("[OreMiner] Config loaded - Humanize: " + humanizeEnabled + ", Range: " + range);
+        for (Map.Entry<String, Boolean> entry : oreEnabled.entrySet()) {
+            System.out.println("[OreMiner] Ore enabled - " + entry.getKey() + ": " + entry.getValue());
+        }
     }
 
     public void saveConfig() {
@@ -65,6 +73,7 @@ public class MinerConfig {
         }
 
         config.save();
+        System.out.println("[OreMiner] Config saved");
     }
 
     public boolean isHumanizeEnabled() {

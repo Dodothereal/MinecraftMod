@@ -29,6 +29,9 @@ public class MiningCommand extends CommandBase {
     @Override
     public void processCommand(ICommandSender sender, String[] args) throws CommandException {
         if (args.length == 0) {
+            // Add feedback message to confirm command was processed
+            sender.addChatMessage(new ChatComponentText(EnumChatFormatting.GREEN + "Opening Ore Miner GUI..."));
+
             // Schedule GUI opening on the main Minecraft thread
             Minecraft.getMinecraft().addScheduledTask(() -> {
                 Minecraft.getMinecraft().displayGuiScreen(new MinerGUI());

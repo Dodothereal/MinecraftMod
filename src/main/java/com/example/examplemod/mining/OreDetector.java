@@ -30,6 +30,8 @@ public class OreDetector {
         oreBlocks.put("Coal", Blocks.coal_ore);
         oreBlocks.put("Redstone", Blocks.redstone_ore);
         oreBlocks.put("Lapis", Blocks.lapis_ore);
+
+        System.out.println("[OreMiner] OreDetector initialized with " + oreBlocks.size() + " ore types");
     }
 
     @SubscribeEvent
@@ -52,6 +54,7 @@ public class OreDetector {
             return;
         }
 
+        int previousCount = detectedOres.size();
         detectedOres.clear();
 
         BlockPos playerPos = new BlockPos(mc.thePlayer.posX, mc.thePlayer.posY, mc.thePlayer.posZ);
@@ -68,6 +71,11 @@ public class OreDetector {
                     }
                 }
             }
+        }
+
+        // Only log if the count changed to avoid spam
+        if (detectedOres.size() != previousCount) {
+            System.out.println("[OreMiner] Scan completed: Found " + detectedOres.size() + " ores in range " + range);
         }
     }
 

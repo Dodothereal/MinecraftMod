@@ -37,6 +37,7 @@ public class OreMinerMod
     public void preInit(FMLPreInitializationEvent event) {
         // Initialize config
         config = new MinerConfig();
+        System.out.println("[OreMiner] Pre-initialization complete");
     }
 
     @EventHandler
@@ -54,7 +55,10 @@ public class OreMinerMod
         // Register commands
         ClientCommandHandler.instance.registerCommand(new MiningCommand());
 
-        System.out.println("OreMiner mod initialized!");
+        System.out.println("[OreMiner] Mod initialized successfully!");
+        System.out.println("[OreMiner] Type /89 to open the configuration GUI");
+        System.out.println("[OreMiner] Type /89 toggle to enable/disable mining");
+        System.out.println("[OreMiner] Type /89 help for more information");
     }
 
     @SubscribeEvent
