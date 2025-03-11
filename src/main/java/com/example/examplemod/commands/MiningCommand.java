@@ -29,8 +29,10 @@ public class MiningCommand extends CommandBase {
     @Override
     public void processCommand(ICommandSender sender, String[] args) throws CommandException {
         if (args.length == 0) {
-            // Open GUI when no arguments are provided
-            Minecraft.getMinecraft().displayGuiScreen(new MinerGUI());
+            // Schedule GUI opening on the main Minecraft thread
+            Minecraft.getMinecraft().addScheduledTask(() -> {
+                Minecraft.getMinecraft().displayGuiScreen(new MinerGUI());
+            });
         } else if (args.length == 1) {
             if (args[0].equalsIgnoreCase("toggle")) {
                 // Toggle miner on/off
